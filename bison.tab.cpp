@@ -611,8 +611,8 @@ static const yytype_int16 yyrline[] =
      114,   115,   121,   126,   137,   146,   154,   165,   179,   183,
      187,   191,   195,   199,   203,   207,   216,   222,   227,   242,
      243,   248,   253,   261,   265,   269,   273,   277,   281,   290,
-     291,   298,   301,   309,   315,   325,   331,   345,   345,   356,
-     361,   356,   377,   377,   407,   407,   426
+     291,   298,   301,   309,   317,   336,   342,   356,   356,   367,
+     372,   367,   388,   388,   418,   418,   437
 };
 #endif
 
@@ -1842,28 +1842,37 @@ yyreduce:
     break;
 
   case 44: /* imprime: PRINTF LPAR_EXPR STRING VIRGULA arglist RPAR_EXPR PEV  */
-#line 315 "synan.y"
+#line 317 "synan.y"
                                                             {
-            std::cout << "printf \"" << *(yyvsp[-4].str_val) << "\"" << std::endl;
-            /* arglist já emitiu os printv durante a redução */
+            std::string s = *(yyvsp[-4].str_val);
+            size_t pos;
+            while ((pos = s.find("%d")) != std::string::npos) s.erase(pos, 2);
+            while ((pos = s.find('%')) != std::string::npos) s.erase(pos, 1);
+            if (s.empty()) {
+                /* emit an empty printf so the runtime doesn't print a stray '%' */
+                std::cout << "printf \"\"" << std::endl;
+            } else {
+                if (s.back() != ' ') s.push_back(' ');
+                std::cout << "printf \"" << s << "\"" << std::endl;
+            }
             delete (yyvsp[-4].str_val);
       }
-#line 1852 "bison.tab.cpp"
+#line 1861 "bison.tab.cpp"
     break;
 
   case 45: /* ler: SCANF LPAR_EXPR ID RPAR_EXPR PEV  */
-#line 325 "synan.y"
+#line 336 "synan.y"
                                        {
             int e = getend(*(yyvsp[-2].str_val));
             if (e == -1) sem_erro("variavel nao declarada: " + *(yyvsp[-2].str_val));
             std::cout << "read %r" << e << std::endl;
             delete (yyvsp[-2].str_val);
       }
-#line 1863 "bison.tab.cpp"
+#line 1872 "bison.tab.cpp"
     break;
 
   case 46: /* ler: SCANF LPAR_EXPR ID LCOLCHETES expr RCOLCHETES RPAR_EXPR PEV  */
-#line 331 "synan.y"
+#line 342 "synan.y"
                                                                   {
             int e = getend(*(yyvsp[-5].str_val));
             if (e == -1) sem_erro("variavel nao declarada: " + *(yyvsp[-5].str_val));
@@ -1872,42 +1881,42 @@ yyreduce:
             T++;
             delete (yyvsp[-5].str_val);
       }
-#line 1876 "bison.tab.cpp"
+#line 1885 "bison.tab.cpp"
     break;
 
   case 47: /* $@1: %empty  */
-#line 345 "synan.y"
+#line 356 "synan.y"
                                      {
         int cond_tmp = val_stack.top(); val_stack.pop();
         int exit_label = S++;
         std::cout << "jf %t" << cond_tmp << ", R" << exit_label << std::endl;
         lbl_stack.push(exit_label);
     }
-#line 1887 "bison.tab.cpp"
+#line 1896 "bison.tab.cpp"
     break;
 
   case 48: /* condicional: IF LPAR_EXPR condicoes RPAR_EXPR $@1 LCHAVES codigos RCHAVES  */
-#line 350 "synan.y"
+#line 361 "synan.y"
                               {
         int exit_label = lbl_stack.top(); lbl_stack.pop();
         std::cout << "label R" << exit_label << std::endl;
     }
-#line 1896 "bison.tab.cpp"
+#line 1905 "bison.tab.cpp"
     break;
 
   case 49: /* $@2: %empty  */
-#line 356 "synan.y"
+#line 367 "synan.y"
                                      {
         int cond_tmp = val_stack.top(); val_stack.pop();
         int else_label = S++;
         std::cout << "jf %t" << cond_tmp << ", R" << else_label << std::endl;
         lbl_stack.push(else_label);
     }
-#line 1907 "bison.tab.cpp"
+#line 1916 "bison.tab.cpp"
     break;
 
   case 50: /* $@3: %empty  */
-#line 361 "synan.y"
+#line 372 "synan.y"
                               {
         int else_label = lbl_stack.top(); lbl_stack.pop();
         int end_label = S++;
@@ -1915,20 +1924,20 @@ yyreduce:
         std::cout << "label R" << else_label << std::endl;
         lbl_stack.push(end_label);
     }
-#line 1919 "bison.tab.cpp"
+#line 1928 "bison.tab.cpp"
     break;
 
   case 51: /* condicional: IF LPAR_EXPR condicoes RPAR_EXPR $@2 LCHAVES codigos RCHAVES $@3 ELSE LCHAVES codigos RCHAVES  */
-#line 367 "synan.y"
+#line 378 "synan.y"
                                    {
         int end_label = lbl_stack.top(); lbl_stack.pop();
         std::cout << "label R" << end_label << std::endl;
     }
-#line 1928 "bison.tab.cpp"
+#line 1937 "bison.tab.cpp"
     break;
 
   case 52: /* $@4: %empty  */
-#line 377 "synan.y"
+#line 388 "synan.y"
                                                                   {
             /* pop condição e criar rótulos; emitir label/ jf antes do bloco */
             int cond_tmp = val_stack.top(); val_stack.pop();
@@ -1939,11 +1948,11 @@ yyreduce:
             lbl_stack.push(loop);
             lbl_stack.push(exit_label);
       }
-#line 1943 "bison.tab.cpp"
+#line 1952 "bison.tab.cpp"
     break;
 
   case 53: /* laco: FOR LPAR_EXPR atrib condicoes PEV ID cremento_for RPAR_EXPR $@4 LCHAVES codigos RCHAVES  */
-#line 386 "synan.y"
+#line 397 "synan.y"
                                 {
             /* recuperar rótulos e emitir incremento + jump + label exit */
             int exit_label = lbl_stack.top(); lbl_stack.pop();
@@ -1963,11 +1972,11 @@ yyreduce:
 
             delete (yyvsp[-6].str_val);
       }
-#line 1967 "bison.tab.cpp"
+#line 1976 "bison.tab.cpp"
     break;
 
   case 54: /* $@5: %empty  */
-#line 407 "synan.y"
+#line 418 "synan.y"
                                           {
             int cond_tmp = val_stack.top(); val_stack.pop();
             int loop = S++;
@@ -1977,31 +1986,31 @@ yyreduce:
             lbl_stack.push(loop);
             lbl_stack.push(exit_label);
       }
-#line 1981 "bison.tab.cpp"
+#line 1990 "bison.tab.cpp"
     break;
 
   case 55: /* laco: WHILE LPAR_EXPR condicoes RPAR_EXPR $@5 LCHAVES codigos RCHAVES  */
-#line 415 "synan.y"
+#line 426 "synan.y"
                                 {
             int exit_label = lbl_stack.top(); lbl_stack.pop();
             int loop = lbl_stack.top(); lbl_stack.pop();
             std::cout << "jump R" << loop << std::endl;
             std::cout << "label R" << exit_label << std::endl;
       }
-#line 1992 "bison.tab.cpp"
+#line 2001 "bison.tab.cpp"
     break;
 
   case 56: /* retorno: RETURN expr PEV  */
-#line 426 "synan.y"
+#line 437 "synan.y"
                       {
             /* Raposeitor não precisa realmente de ret; colocar label/municao opcional */
             std::cout << "mov %r0, %t" << (yyvsp[-1].int_val) << std::endl; /* coloca em r0 por exemplo */
       }
-#line 2001 "bison.tab.cpp"
+#line 2010 "bison.tab.cpp"
     break;
 
 
-#line 2005 "bison.tab.cpp"
+#line 2014 "bison.tab.cpp"
 
       default: break;
     }
@@ -2225,7 +2234,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 432 "synan.y"
+#line 443 "synan.y"
 
 
 /* ---------------- ERRO SINTÁTICO ---------------- */

@@ -23,6 +23,6 @@ label R1
 printf "O maior numero e"
 mov %t9, %r3
 printv %t9
-printf "%d"
+printf ""
 mov %t10, 0
 mov %r0, %t10

@@ -311,10 +311,21 @@ imprime:
             delete $3;
       }
 
-    /* caso 3: string + lista de expressões no template */
+    /* caso 3: string + lista de expressões no template
+       Remover os placeholders "%d" da string; também remover '%' sobrando
+       e garantir um espaço separador antes do printv. */
     | PRINTF LPAR_EXPR STRING VIRGULA arglist RPAR_EXPR PEV {
-            std::cout << "printf \"" << *$3 << "\"" << std::endl;
-            /* arglist já emitiu os printv durante a redução */
+            std::string s = *$3;
+            size_t pos;
+            while ((pos = s.find("%d")) != std::string::npos) s.erase(pos, 2);
+            while ((pos = s.find('%')) != std::string::npos) s.erase(pos, 1);
+            if (s.empty()) {
+                /* emit an empty printf so the runtime doesn't print a stray '%' */
+                std::cout << "printf \"\"" << std::endl;
+            } else {
+                if (s.back() != ' ') s.push_back(' ');
+                std::cout << "printf \"" << s << "\"" << std::endl;
+            }
             delete $3;
       }
     ;
