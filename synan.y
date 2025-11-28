@@ -361,9 +361,16 @@ opt_template:
   | LPAR_EXPR RPAR_EXPR
   ;
 
+else_block:
+    ELSE opt_template LCHAVES codigos RCHAVES
+    {
+        // ELSE isolado: não precisa de jumps ou labels
+    }
+    ;
+
+
 condicional:
-    /* IF-ELSE */
-    IF LPAR_EXPR condicoes RPAR_EXPR LCHAVES
+      IF LPAR_EXPR condicoes RPAR_EXPR LCHAVES
         {
             int cond_tmp;
             if (val_stack.empty()) {
@@ -389,8 +396,8 @@ condicional:
             std::cout << "label R" << end_label << std::endl;
         }
 
-    /* IF simples */
-  | IF LPAR_EXPR condicoes RPAR_EXPR LCHAVES
+      |     /* IF-ELSE */
+    IF LPAR_EXPR condicoes RPAR_EXPR LCHAVES
         {
             int cond_tmp;
             if (val_stack.empty()) {

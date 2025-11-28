@@ -616,7 +616,7 @@ static const yytype_int16 yyrline[] =
      191,   195,   199,   203,   207,   211,   220,   226,   231,   246,
      247,   252,   257,   265,   269,   273,   277,   281,   285,   294,
      295,   302,   305,   313,   321,   340,   346,   358,   360,   361,
-     367,   366,   394,   393,   418,   429,   439,   460,   472
+     374,   373,   401,   400,   425,   436,   446,   467,   479
 };
 #endif
 
@@ -1892,7 +1892,7 @@ yyreduce:
     break;
 
   case 50: /* $@1: %empty  */
-#line 367 "synan.y"
+#line 374 "synan.y"
         {
             int cond_tmp;
             if (val_stack.empty()) {
@@ -1911,7 +1911,7 @@ yyreduce:
     break;
 
   case 51: /* condicional: IF LPAR_EXPR condicoes RPAR_EXPR LCHAVES $@1 codigos RCHAVES ELSE opt_template LCHAVES codigos RCHAVES  */
-#line 382 "synan.y"
+#line 389 "synan.y"
         {
             if (lbl_stack.empty()) sem_erro("lbl_stack vazio no IF-ELSE (else_label)");
             int else_label = lbl_stack.top(); lbl_stack.pop();
@@ -1925,7 +1925,7 @@ yyreduce:
     break;
 
   case 52: /* $@2: %empty  */
-#line 394 "synan.y"
+#line 401 "synan.y"
         {
             int cond_tmp;
             if (val_stack.empty()) {
@@ -1942,7 +1942,7 @@ yyreduce:
     break;
 
   case 53: /* condicional: IF LPAR_EXPR condicoes RPAR_EXPR LCHAVES $@2 codigos RCHAVES  */
-#line 407 "synan.y"
+#line 414 "synan.y"
         {
             if (lbl_stack.empty()) sem_erro("lbl_stack vazio no IF simples");
             int exit_label = lbl_stack.top(); lbl_stack.pop();
@@ -1952,7 +1952,7 @@ yyreduce:
     break;
 
   case 54: /* mid_loop_start: %empty  */
-#line 418 "synan.y"
+#line 425 "synan.y"
                 {
         int loop = S++;
         int exit_label = S++;
@@ -1964,7 +1964,7 @@ yyreduce:
     break;
 
   case 55: /* mid_loop_jf: %empty  */
-#line 429 "synan.y"
+#line 436 "synan.y"
                 {
         if (val_stack.empty()) sem_erro("condicao ausente no for/while");
         int cond_tmp = val_stack.top(); val_stack.pop();
@@ -1975,7 +1975,7 @@ yyreduce:
     break;
 
   case 56: /* laco: FOR LPAR_EXPR atrib mid_loop_start condicoes mid_loop_jf PEV ID cremento_for RPAR_EXPR LCHAVES codigos RCHAVES  */
-#line 439 "synan.y"
+#line 446 "synan.y"
                                                                                                                      {
             /* recuperar rótulos */
             int loop = loop_stack.top(); loop_stack.pop();
@@ -1999,7 +1999,7 @@ yyreduce:
     break;
 
   case 57: /* laco: WHILE LPAR_EXPR mid_loop_start condicoes mid_loop_jf RPAR_EXPR LCHAVES codigos RCHAVES  */
-#line 460 "synan.y"
+#line 467 "synan.y"
                                                                                              {
             int loop = loop_stack.top(); loop_stack.pop();
             int exit_label = exit_stack.top(); exit_stack.pop();
@@ -2011,7 +2011,7 @@ yyreduce:
     break;
 
   case 58: /* retorno: RETURN expr PEV  */
-#line 472 "synan.y"
+#line 479 "synan.y"
                       {
             /* Raposeitor não precisa realmente de ret; colocar label/municao opcional */
             std::cout << "mov %r0, %t" << (yyvsp[-1].int_val) << std::endl; /* coloca em r0 por exemplo */
@@ -2244,7 +2244,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 478 "synan.y"
+#line 485 "synan.y"
 
 
 /* ---------------- ERRO SINTÁTICO ---------------- */
