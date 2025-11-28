@@ -382,42 +382,31 @@ condicional:
             int else_label = S++;
             int end_label = S++;
             std::cout << "jf %t" << cond_tmp << ", R" << else_label << std::endl;
-            lbl_stack.push(end_label);    // push end_label first
-            lbl_stack.push(else_label);   // then else_label
-        }
-    codigos RCHAVES ELSE opt_template LCHAVES codigos RCHAVES
-        {
-            if (lbl_stack.empty()) sem_erro("lbl_stack vazio no IF-ELSE (else_label)");
-            int else_label = lbl_stack.top(); lbl_stack.pop();
-            if (lbl_stack.empty()) sem_erro("lbl_stack vazio no IF-ELSE (end_label)");
-            int end_label = lbl_stack.top(); lbl_stack.pop();
-            std::cout << "jump R" << end_label << std::endl;
-            std::cout << "label R" << else_label << std::endl;
-            std::cout << "label R" << end_label << std::endl;
-        }
-
-      |     /* IF-ELSE */
-    IF LPAR_EXPR condicoes RPAR_EXPR LCHAVES
-        {
-            int cond_tmp;
-            if (val_stack.empty()) {
-                std::cout << "mov %t" << T << ", 1" << std::endl;
-                cond_tmp = T++;
-            } else {
-                cond_tmp = val_stack.top(); val_stack.pop();
-            }
-            int exit_label = S++;
-            std::cout << "jf %t" << cond_tmp << ", R" << exit_label << std::endl;
-            lbl_stack.push(exit_label);
+            lbl_stack.push(else_label);
+            lbl_stack.push(end_label);
         }
     codigos RCHAVES
         {
-            if (lbl_stack.empty()) sem_erro("lbl_stack vazio no IF simples");
-            int exit_label = lbl_stack.top(); lbl_stack.pop();
-            std::cout << "label R" << exit_label << std::endl;
+            if (lbl_stack.empty()) sem_erro("lbl_stack vazio no IF");
+            int end_label = lbl_stack.top(); lbl_stack.pop();
+            if (lbl_stack.empty()) sem_erro("lbl_stack vazio no IF");
+            int else_label = lbl_stack.top(); lbl_stack.pop();
+            std::cout << "jump R" << end_label << std::endl;
+            std::cout << "label R" << else_label << std::endl;
+            lbl_stack.push(end_label);  /* push it back for else_part */
+        }
+    else_part
+        {
+            if (lbl_stack.empty()) sem_erro("lbl_stack vazio no IF");
+            int end_label = lbl_stack.top(); lbl_stack.pop();
+            std::cout << "label R" << end_label << std::endl;
         }
   ;
 
+else_part:
+    ELSE opt_template LCHAVES codigos RCHAVES
+    | /* vazio */
+    ;
 /* ---------------- LAÇOS ---------------- */
 
 /* mid-marker: start of loop -> create labels and emit label Rloop */

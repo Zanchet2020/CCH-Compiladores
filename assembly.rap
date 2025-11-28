@@ -1,26 +1,22 @@
-mov %t0, 10
-mov %r0, %t0
-mov %t1, 20
-mov %r1, %t1
-printf "Teste 1: IF verdadeiro\n"
-mov %t2, %r0
-mov %t3, %r1
-less %t4, %t2, %t3
-jf %t4, R0
-printf "Entrou no IF (1)\n"
-printf "Entrou no ELSE (1)\n"
-jump R1
+mov %t0, 0
+mov %r1, %t0
+mov %t1, 1
+mov %r0, %t1
 label R0
+mov %t2, %r0
+mov %t3, 6
+less %t4, %t2, %t3
+jf %t4, R1
+mov %t5, %r1
+mov %t6, 1
+add %t7, %t5, %t6
+mov %r1, %t7
+add %r0, %r0, 1
+jump R0
 label R1
-printf "Teste 2: IF falso\n"
-mov %t5, %r0
-mov %t6, %r1
-greater %t7, %t5, %t6
-jf %t7, R2
-printf "Entrou no IF (2)\n"
-printf "Entrou no ELSE (2)\n"
-jump R3
-label R2
-label R3
-mov %t8, 0
-mov %r0, %t8
+printf "A soma de 1 a 5 e\n"
+mov %t8, %r1
+printv %t8
+printf ""
+mov %t9, 0
+mov %r0, %t9
