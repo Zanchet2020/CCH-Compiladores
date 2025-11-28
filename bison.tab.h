@@ -93,7 +93,8 @@ extern int yydebug;
     OR = 294,                      /* OR  */
     NOT = 295,                     /* NOT  */
     LPAR_EXPR = 296,               /* LPAR_EXPR  */
-    RPAR_EXPR = 297                /* RPAR_EXPR  */
+    RPAR_EXPR = 297,               /* RPAR_EXPR  */
+    EMPTY_TEMPLATE = 298           /* EMPTY_TEMPLATE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -107,7 +108,7 @@ union YYSTYPE
       int int_val;
       std::string* str_val;
 
-#line 111 "bison.tab.h"
+#line 112 "bison.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

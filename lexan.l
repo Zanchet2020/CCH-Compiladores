@@ -39,14 +39,13 @@ num_int   {digito}+
 
     /* --- MUDANÇA DE ESTADOS --- */
 
-    /* Entra no Template */
-"|:"               { BEGIN(TEMPLATE); return LPAR_EXPR; }
+    /* match the empty template sequence first (three chars) to avoid overlap */
+<INITIAL,TEMPLATE>"|:|"    { return EMPTY_TEMPLATE; }
 
-    /* Sai do Template */
-<TEMPLATE>":|" {
-    BEGIN(INITIAL);
-    return RPAR_EXPR;
-}
+/* Entra no Template */
+<INITIAL,TEMPLATE>"|:"      { BEGIN(TEMPLATE); return LPAR_EXPR; }
+/* Sai do Template */
+<TEMPLATE>":|"              { BEGIN(INITIAL); return RPAR_EXPR; }
 
     /* --- REGRAS COMPARTILHADAS (INITIAL e TEMPLATE) --- */
     /* Isso evita duplicar código para operadores que existem nos dois contextos */
@@ -69,11 +68,8 @@ num_int   {digito}+
 <INITIAL,TEMPLATE>","  { return VIRGULA; }
 
     /* Acesso a vetores dentro e fora */
-<INITIAL,TEMPLATE>"{"  { return LCOLCHETES; }
-<INITIAL,TEMPLATE>"}"  { return RCOLCHETES; }
-
-
-    /* --- REGRAS ESPECÍFICAS DO INITIAL --- */
+<INITIAL,TEMPLATE>"["  { return LCOLCHETES; }
+<INITIAL,TEMPLATE>"]"  { return RCOLCHETES; }
 
     /* Delimitadores de bloco */
 <INITIAL,TEMPLATE>"[:"   { return LCHAVES; }

@@ -13,9 +13,9 @@ INSCULPIRE |: c :|.
 
 maior ACCIPIT a.
 
-SIVERITAS |: b > maior :| [:
+SIVERITAS |: b > a :| [:
     maior ACCIPIT b.
-:]
+:] 
 
 SIVERITAS |: c > maior :| [:
     maior ACCIPIT c.

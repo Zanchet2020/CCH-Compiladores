@@ -93,6 +93,7 @@ void sem_erro(const std::string &msg) {
 
 /* tokens de template */
 %token LPAR_EXPR RPAR_EXPR
+%token EMPTY_TEMPLATE
 
 /* não-terminais */
 %type <int_val> expr termo fator condicoes condicao cremento_for
@@ -353,33 +354,33 @@ ler:
     ;
 
 /* ---------------- CONDICIONAL (IF / IF-ELSE) ---------------- */
+  
+opt_template:
+    /* vazio */ 
+  | EMPTY_TEMPLATE
+  | LPAR_EXPR RPAR_EXPR
+  ;
 
 condicional:
     /* if simples: emitir jf antes do bloco, label após o bloco */
-    IF LPAR_EXPR condicoes RPAR_EXPR {
+    IF LPAR_EXPR condicoes RPAR_EXPR LCHAVES codigos RCHAVES {
         int cond_tmp = val_stack.top(); val_stack.pop();
         int exit_label = S++;
         std::cout << "jf %t" << cond_tmp << ", R" << exit_label << std::endl;
-        lbl_stack.push(exit_label);
-    } LCHAVES codigos RCHAVES {
-        int exit_label = lbl_stack.top(); lbl_stack.pop();
         std::cout << "label R" << exit_label << std::endl;
     }
 
-  /* if-else: emitimos jf antes do bloco IF, jump/label entre blocos, label end após ELSE */
-  | IF LPAR_EXPR condicoes RPAR_EXPR {
+  /* if-else: aceitar opcional "|:|" entre ALITER e o bloco */
+  | IF LPAR_EXPR condicoes RPAR_EXPR LCHAVES codigos RCHAVES ELSE opt_template LCHAVES codigos RCHAVES {
         int cond_tmp = val_stack.top(); val_stack.pop();
         int else_label = S++;
-        std::cout << "jf %t" << cond_tmp << ", R" << else_label << std::endl;
-        lbl_stack.push(else_label);
-    } LCHAVES codigos RCHAVES {
-        int else_label = lbl_stack.top(); lbl_stack.pop();
         int end_label = S++;
+
+        std::cout << "jf %t" << cond_tmp << ", R" << else_label << std::endl;
+        /* bloco IF já foi gerado em $7 (codigos) */
         std::cout << "jump R" << end_label << std::endl;
         std::cout << "label R" << else_label << std::endl;
-        lbl_stack.push(end_label);
-    } ELSE LCHAVES codigos RCHAVES {
-        int end_label = lbl_stack.top(); lbl_stack.pop();
+        /* bloco ELSE já foi gerado em $11 (codigos) */
         std::cout << "label R" << end_label << std::endl;
     }
   ;
