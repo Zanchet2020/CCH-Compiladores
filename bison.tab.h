@@ -102,7 +102,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 62 "synan.y"
+#line 65 "synan.y"
 
       int int_val;
       std::string* str_val;

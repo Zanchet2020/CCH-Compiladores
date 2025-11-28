@@ -6,11 +6,10 @@ inteiro soma.
 soma ACCIPIT 0.
 
 CIRCA |: i ACCIPIT 1. i < 6. i ++ :| [:
-    PRONUNTIARE |:"teste":|.
-    soma ACCIPIT soma + i.
+    soma ACCIPIT soma + 1.
 :]
 
-PRONUNTIARE |:"A soma de 1 a 5 e":|.
+PRONUNTIARE |:"A soma de 1 a 5 e\n":|.
 PRONUNTIARE |:"%d", soma:|.
 
 REVERSIO 0.

@@ -2,14 +2,14 @@ mov %t0, 0
 mov %r1, %t0
 mov %t1, 1
 mov %r0, %t1
+label R0
 mov %t2, %r0
 mov %t3, 6
 less %t4, %t2, %t3
-label R0
 jf %t4, R1
 printf "teste"
 mov %t5, %r1
-mov %t6, %r0
+mov %t6, 1
 add %t7, %t5, %t6
 mov %r1, %t7
 add %r0, %r0, 1

@@ -106,10 +106,13 @@ int auxEnd = 0;
 int T = 0;  /* temporários %t */
 int S = 0;  /* labels R... */
 
-/* Pilha para rótulos usada nas ações mid-rule reescritas */
+/* Pilhas para rótulos usadas nas ações mid-rule reescritas */
 std::stack<int> lbl_stack;
 /* Pilha para armazenar o índice %t resultante de reduções de 'condicoes' */
 std::stack<int> val_stack;
+/* Pilhas específicas para laços (loop / exit) */
+std::stack<int> loop_stack;
+std::stack<int> exit_stack;
   
 /* Funções utilitárias */
 int getend(const std::string &id) {
@@ -124,7 +127,7 @@ void sem_erro(const std::string &msg) {
 }
 
 
-#line 128 "bison.tab.cpp"
+#line 131 "bison.tab.cpp"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -214,9 +217,9 @@ enum yysymbol_kind_t
   YYSYMBOL_59_1 = 59,                      /* $@1  */
   YYSYMBOL_60_2 = 60,                      /* $@2  */
   YYSYMBOL_61_3 = 61,                      /* $@3  */
-  YYSYMBOL_laco = 62,                      /* laco  */
-  YYSYMBOL_63_4 = 63,                      /* $@4  */
-  YYSYMBOL_64_5 = 64,                      /* $@5  */
+  YYSYMBOL_mid_loop_start = 62,            /* mid_loop_start  */
+  YYSYMBOL_mid_loop_jf = 63,               /* mid_loop_jf  */
+  YYSYMBOL_laco = 64,                      /* laco  */
   YYSYMBOL_retorno = 65                    /* retorno  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
@@ -545,7 +548,7 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  3
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   189
+#define YYLAST   191
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  43
@@ -554,7 +557,7 @@ union yyalloc
 /* YYNRULES -- Number of rules.  */
 #define YYNRULES  56
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  141
+#define YYNSTATES  143
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   297
@@ -607,12 +610,12 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   100,   100,   103,   105,   109,   110,   111,   112,   113,
-     114,   115,   121,   126,   137,   146,   154,   165,   179,   183,
-     187,   191,   195,   199,   203,   207,   216,   222,   227,   242,
-     243,   248,   253,   261,   265,   269,   273,   277,   281,   290,
-     291,   298,   301,   309,   317,   336,   342,   356,   356,   367,
-     372,   367,   388,   388,   418,   418,   437
+       0,   103,   103,   106,   108,   112,   113,   114,   115,   116,
+     117,   118,   124,   129,   140,   149,   157,   168,   182,   186,
+     190,   194,   198,   202,   206,   210,   219,   225,   230,   245,
+     246,   251,   256,   264,   268,   272,   276,   280,   284,   293,
+     294,   301,   304,   312,   320,   339,   345,   359,   359,   370,
+     375,   370,   391,   402,   412,   433,   445
 };
 #endif
 
@@ -637,7 +640,7 @@ static const char *const yytname[] =
   "RPAR_EXPR", "$accept", "programa", "codigos", "codigo", "declara",
   "atrib", "expr", "termo", "fator", "condicoes", "condicao",
   "cremento_for", "arglist", "imprime", "ler", "condicional", "$@1", "$@2",
-  "$@3", "laco", "$@4", "$@5", "retorno", YY_NULLPTR
+  "$@3", "mid_loop_start", "mid_loop_jf", "laco", "retorno", YY_NULLPTR
 };
 
 static const char *
@@ -647,7 +650,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-33)
+#define YYPACT_NINF (-93)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -661,21 +664,21 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-     -33,    13,    39,   -33,    72,     4,    26,    35,    75,    56,
-      70,     0,   -33,   -33,   -33,   -33,   -33,   -33,   -33,   -33,
-       0,    17,    -1,    96,    -1,    11,   114,   124,   139,   -33,
-       0,    31,   115,   -33,    24,     0,    84,    -1,   142,    90,
-     -32,    -1,   121,   159,   -33,    -7,   -13,     0,     5,     0,
-       0,   -33,     0,     0,     0,   141,    19,   -33,   -33,     0,
-       0,     0,     0,     0,     0,   -33,    -1,    -1,   145,   -33,
-     147,     0,   148,     0,   149,    58,   -33,   115,   115,   -33,
-     -33,   -33,    18,   150,    50,    50,    50,    50,    50,    50,
-     151,   155,   -33,   -33,   172,   157,   154,     9,   136,   -33,
-     137,   -33,   -33,     0,    89,   -33,   -33,   -33,    67,   -33,
-     -33,     0,   156,   138,    21,   -33,    52,    74,   -33,   -33,
-     140,    86,   -33,   -33,   158,   160,   -33,   -33,   -33,   -33,
-     -33,   -33,   161,   165,   166,   -33,   -33,    99,   111,   -33,
-     -33
+     -93,    32,   109,   -93,     7,   -25,    58,    66,    54,    96,
+     105,    -1,   -93,   -93,   -93,   -93,   -93,   -93,   -93,   -93,
+      -1,     2,    -2,    90,   -93,    57,   123,   152,   143,   -93,
+      -1,    19,    21,   -93,    69,    -1,    67,    -2,   147,   114,
+      28,   -93,    -2,   160,   -93,    17,    -8,    -1,     5,    -1,
+      -1,   -93,    -1,    -1,    -1,   140,    14,   -93,   -93,    -1,
+      -1,    -1,    -1,    -1,    -1,   -93,    -2,    -2,    -2,   -93,
+     145,    -1,   146,    -1,   148,    89,   -93,    21,    21,   -93,
+     -93,   -93,     3,   149,    78,    78,    78,    78,    78,    78,
+     151,   154,   -93,   -93,   -93,   126,   153,    11,   132,   -93,
+     135,   -93,   -93,    -1,    91,   -93,   -93,   -93,   155,   156,
+     -93,    -1,   157,   137,    16,   -93,    34,    52,   174,   -93,
+     -93,   -93,   158,   159,   -93,   -93,   107,    74,   -93,   -93,
+     161,   -93,   -93,   141,   -93,   165,   166,   -93,   -93,    86,
+      99,   -93,   -93
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -685,35 +688,35 @@ static const yytype_int8 yydefact[] =
 {
        3,     0,     2,     1,     0,     0,     0,     0,     0,     0,
        0,     0,     4,     5,     6,     7,     8,     9,    10,    11,
-       0,     0,     0,     0,     0,     0,     0,     0,    25,    26,
+       0,     0,     0,     0,    52,     0,     0,     0,    25,    26,
        0,     0,    20,    24,     0,     0,     0,     0,     0,     0,
-      29,     0,     0,     0,    12,     0,     0,     0,     0,     0,
+      29,    52,     0,     0,    12,     0,     0,     0,     0,     0,
        0,    56,     0,     0,     0,     0,     0,    14,    32,     0,
-       0,     0,     0,     0,     0,    47,     0,     0,     0,    54,
+       0,     0,     0,     0,     0,    47,     0,     0,     0,    53,
        0,     0,     0,     0,     0,     0,    27,    18,    19,    21,
       22,    23,     0,    27,    38,    37,    36,    35,    33,    34,
-       0,     0,    31,    30,     0,     0,     0,    41,     0,    43,
-       0,    45,    28,     0,     0,    15,     3,     3,     0,     3,
-      13,     0,     0,     0,     0,    16,     0,     0,    39,    40,
-       0,     0,    42,    44,     0,    27,    48,    50,    52,    55,
-      46,    17,     0,     0,     0,     3,     3,     0,     0,    53,
-      51
+       0,     0,    31,    30,    53,     0,     0,    41,     0,    43,
+       0,    45,    28,     0,     0,    15,     3,     3,     0,     0,
+      13,     0,     0,     0,     0,    16,     0,     0,     0,     3,
+      42,    44,     0,    27,    48,    50,     0,     0,    46,    17,
+       0,    39,    40,     0,    55,     0,     0,     3,     3,     0,
+       0,    51,    54
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-     -33,   -33,    30,   -33,   -33,   163,   -11,   112,    98,   -23,
-     -33,   -33,    76,   -33,   -33,   -33,   -33,   -33,   -33,   -33,
-     -33,   -33,   -33
+     -93,   -93,   -92,   -93,   -93,   163,   -11,    82,    98,    81,
+     -93,   -93,    76,   -93,   -93,   -93,   -93,   -93,   -93,   150,
+      94,   -93,   -93
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_uint8 yydefgoto[] =
 {
        0,     1,     2,    12,    13,    14,    38,    32,    33,    39,
-      40,   120,    98,    15,    16,    17,    90,    91,   132,    18,
-     133,    95,    19
+      40,   133,    98,    15,    16,    17,    90,    91,   130,    42,
+      95,    18,    19
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -721,48 +724,50 @@ static const yytype_uint8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      31,    42,    28,    28,    29,    29,    66,    67,    73,    34,
-      36,    49,    50,     3,    58,    49,    50,    71,    68,    48,
-      28,    28,    29,    29,    56,    49,    50,    49,    50,    74,
-      49,    50,    43,   111,    44,    72,    75,    49,    50,    37,
-      30,    30,     4,    92,    93,    22,    55,    76,    84,    85,
-      86,    87,    88,    89,    51,     4,    49,    50,    35,   103,
-      97,    83,   100,   125,    49,    50,     5,    23,     6,     7,
-       8,   104,   126,     9,    10,    11,    24,     4,    25,     5,
-     102,     6,     7,     8,   118,   119,     9,    10,    11,     4,
-      49,    50,   114,    20,   127,    49,    50,    26,    21,     4,
-      97,     5,     4,     6,     7,     8,   129,    57,     9,    10,
-      11,    27,   115,     5,     4,     6,     7,     8,    45,   139,
-       9,    10,    11,    52,    53,    54,     5,    46,     6,     7,
-       8,   140,    65,     9,    10,    11,   116,   117,     5,   121,
-       6,     7,     8,    49,    50,     9,    10,    11,    49,    50,
-      79,    80,    81,    59,    60,    61,    62,    63,    64,   113,
-      47,    77,    78,    69,    70,   137,   138,    82,    94,    96,
-     106,    99,   101,   105,   107,   108,   109,   110,   112,   123,
-     124,   130,   128,   131,   135,   136,    41,   122,     0,   134
+      31,    28,    28,    29,    29,    28,    28,    29,    29,    34,
+      36,    49,    50,    73,   116,   117,    22,    49,    50,    48,
+      49,    50,    49,    50,    56,    49,    50,   127,    20,    52,
+      53,    54,     3,    21,    74,   111,    75,     4,    37,    30,
+      30,    71,    51,    35,   103,   139,   140,    76,    84,    85,
+      86,    87,    88,    89,   124,     4,    83,    25,   123,    72,
+      97,     5,   100,     6,     7,     8,    66,    67,     9,    10,
+      11,   104,   125,    49,    50,    49,    50,     4,    43,     5,
+      44,     6,     7,     8,    49,    50,     9,    10,    11,     4,
+      57,    55,   114,     4,   134,    49,    50,    49,    50,    23,
+      97,     5,     4,     6,     7,     8,   141,    24,     9,    10,
+      11,   102,     4,     5,   115,     6,     7,     8,    58,   142,
+       9,    10,    11,    69,   131,   132,     5,    45,     6,     7,
+       8,    77,    78,     9,    10,    11,     5,    26,     6,     7,
+       8,    49,    50,     9,    10,    11,    27,    92,    93,    94,
+      79,    80,    81,    49,    50,    46,    65,   113,    59,    60,
+      61,    62,    63,    64,    47,    70,    82,    96,   109,    99,
+     106,   101,   105,   107,   112,   119,   110,   126,   118,   122,
+     121,   128,   129,   136,   137,   138,    41,   120,   108,   135,
+       0,    68
 };
 
 static const yytype_int16 yycheck[] =
 {
-      11,    24,     3,     3,     5,     5,    38,    39,    21,    20,
-      21,     6,     7,     0,    37,     6,     7,    24,    41,    30,
-       3,     3,     5,     5,    35,     6,     7,     6,     7,    42,
-       6,     7,    21,    24,    23,    42,    47,     6,     7,    40,
-      41,    41,     3,    66,    67,    41,    22,    42,    59,    60,
-      61,    62,    63,    64,    23,     3,     6,     7,    41,    41,
-      71,    42,    73,    42,     6,     7,    27,    41,    29,    30,
-      31,    82,    20,    34,    35,    36,    41,     3,     3,    27,
-      22,    29,    30,    31,    17,    18,    34,    35,    36,     3,
-       6,     7,   103,    21,    20,     6,     7,    41,    26,     3,
-     111,    27,     3,    29,    30,    31,    20,    23,    34,    35,
-      36,    41,    23,    27,     3,    29,    30,    31,     4,    20,
-      34,    35,    36,     8,     9,    10,    27,     3,    29,    30,
-      31,    20,    42,    34,    35,    36,   106,   107,    27,   109,
-      29,    30,    31,     6,     7,    34,    35,    36,     6,     7,
-      52,    53,    54,    11,    12,    13,    14,    15,    16,    22,
-      21,    49,    50,    42,     5,   135,   136,    26,    23,    22,
-      19,    23,    23,    23,    19,     3,    19,    23,    42,    23,
-      42,    23,    42,    23,    19,    19,    23,   111,    -1,    28
+      11,     3,     3,     5,     5,     3,     3,     5,     5,    20,
+      21,     6,     7,    21,   106,   107,    41,     6,     7,    30,
+       6,     7,     6,     7,    35,     6,     7,   119,    21,     8,
+       9,    10,     0,    26,    42,    24,    47,     3,    40,    41,
+      41,    24,    23,    41,    41,   137,   138,    42,    59,    60,
+      61,    62,    63,    64,    20,     3,    42,     3,    42,    42,
+      71,    27,    73,    29,    30,    31,    38,    39,    34,    35,
+      36,    82,    20,     6,     7,     6,     7,     3,    21,    27,
+      23,    29,    30,    31,     6,     7,    34,    35,    36,     3,
+      23,    22,   103,     3,    20,     6,     7,     6,     7,    41,
+     111,    27,     3,    29,    30,    31,    20,    41,    34,    35,
+      36,    22,     3,    27,    23,    29,    30,    31,    37,    20,
+      34,    35,    36,    42,    17,    18,    27,     4,    29,    30,
+      31,    49,    50,    34,    35,    36,    27,    41,    29,    30,
+      31,     6,     7,    34,    35,    36,    41,    66,    67,    68,
+      52,    53,    54,     6,     7,     3,    42,    22,    11,    12,
+      13,    14,    15,    16,    21,     5,    26,    22,    42,    23,
+      19,    23,    23,    19,    42,    19,    23,     3,    23,    42,
+      23,    23,    23,    42,    19,    19,    23,   111,    94,    28,
+      -1,    41
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
@@ -770,20 +775,20 @@ static const yytype_int16 yycheck[] =
 static const yytype_int8 yystos[] =
 {
        0,    44,    45,     0,     3,    27,    29,    30,    31,    34,
-      35,    36,    46,    47,    48,    56,    57,    58,    62,    65,
+      35,    36,    46,    47,    48,    56,    57,    58,    64,    65,
       21,    26,    41,    41,    41,     3,    41,    41,     3,     5,
       41,    49,    50,    51,    49,    41,    49,    40,    49,    52,
-      53,    48,    52,    21,    23,     4,     3,    21,    49,     6,
+      53,    48,    62,    21,    23,     4,     3,    21,    49,     6,
        7,    23,     8,     9,    10,    22,    49,    23,    52,    11,
-      12,    13,    14,    15,    16,    42,    38,    39,    52,    42,
+      12,    13,    14,    15,    16,    42,    38,    39,    62,    52,
        5,    24,    42,    21,    42,    49,    42,    50,    50,    51,
       51,    51,    26,    42,    49,    49,    49,    49,    49,    49,
-      59,    60,    52,    52,    23,    64,    22,    49,    55,    23,
-      49,    23,    22,    41,    49,    23,    19,    19,     3,    19,
-      23,    24,    42,    22,    49,    23,    45,    45,    17,    18,
-      54,    45,    55,    23,    42,    42,    20,    20,    42,    20,
-      23,    23,    61,    63,    28,    19,    19,    45,    45,    20,
-      20
+      59,    60,    52,    52,    52,    63,    22,    49,    55,    23,
+      49,    23,    22,    41,    49,    23,    19,    19,    63,    42,
+      23,    24,    42,    22,    49,    23,    45,    45,    23,    19,
+      55,    23,    42,    42,    20,    20,     3,    45,    23,    23,
+      61,    17,    18,    54,    20,    28,    42,    19,    19,    45,
+      45,    20,    20
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
@@ -794,7 +799,7 @@ static const yytype_int8 yyr1[] =
       49,    50,    50,    50,    50,    51,    51,    51,    51,    52,
       52,    52,    52,    53,    53,    53,    53,    53,    53,    54,
       54,    55,    55,    56,    56,    57,    57,    59,    58,    60,
-      61,    58,    63,    62,    64,    62,    65
+      61,    58,    62,    63,    64,    64,    65
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
@@ -805,7 +810,7 @@ static const yytype_int8 yyr2[] =
        1,     3,     3,     3,     1,     1,     1,     3,     4,     1,
        3,     3,     2,     3,     3,     3,     3,     3,     3,     1,
        1,     1,     3,     5,     7,     5,     8,     0,     8,     0,
-       0,    13,     0,    12,     0,     8,     3
+       0,    13,     0,     0,    13,     9,     3
 };
 
 
@@ -1539,28 +1544,28 @@ yyreduce:
   switch (yyn)
     {
   case 12: /* declara: INT ID PEV  */
-#line 121 "synan.y"
+#line 124 "synan.y"
                  {
             if (getend(*(yyvsp[-1].str_val)) != -1) sem_erro("variavel redeclarada: " + *(yyvsp[-1].str_val));
             tabsimb.push_back({ *(yyvsp[-1].str_val), auxEnd++ });
             delete (yyvsp[-1].str_val);
       }
-#line 1549 "bison.tab.cpp"
+#line 1554 "bison.tab.cpp"
     break;
 
   case 13: /* declara: INT ID LCOLCHETES NUM RCOLCHETES PEV  */
-#line 126 "synan.y"
+#line 129 "synan.y"
                                            {
             if (getend(*(yyvsp[-4].str_val)) != -1) sem_erro("variavel redeclarada: " + *(yyvsp[-4].str_val));
             tabsimb.push_back({ *(yyvsp[-4].str_val), auxEnd });
             auxEnd += (yyvsp[-2].int_val);
             delete (yyvsp[-4].str_val);
       }
-#line 1560 "bison.tab.cpp"
+#line 1565 "bison.tab.cpp"
     break;
 
   case 14: /* atrib: ID ATRIB expr PEV  */
-#line 137 "synan.y"
+#line 140 "synan.y"
                         {
             int e = getend(*(yyvsp[-3].str_val));
             if (e == -1) sem_erro("variavel nao declarada: " + *(yyvsp[-3].str_val));
@@ -1568,11 +1573,11 @@ yyreduce:
             std::cout << "mov %r" << e << ", %t" << (yyvsp[-1].int_val) << std::endl;
             delete (yyvsp[-3].str_val);
       }
-#line 1572 "bison.tab.cpp"
+#line 1577 "bison.tab.cpp"
     break;
 
   case 15: /* atrib: ID ATRIB LPAR_EXPR expr RPAR_EXPR PEV  */
-#line 146 "synan.y"
+#line 149 "synan.y"
                                             {
             int e = getend(*(yyvsp[-5].str_val));
             if (e == -1) sem_erro("variavel nao declarada: " + *(yyvsp[-5].str_val));
@@ -1580,11 +1585,11 @@ yyreduce:
             std::cout << "mov %r" << e << ", %t" << (yyvsp[-2].int_val) << std::endl;
             delete (yyvsp[-5].str_val);
       }
-#line 1584 "bison.tab.cpp"
+#line 1589 "bison.tab.cpp"
     break;
 
   case 16: /* atrib: ID LCOLCHETES expr RCOLCHETES ATRIB expr PEV  */
-#line 154 "synan.y"
+#line 157 "synan.y"
                                                    {
             int e = getend(*(yyvsp[-6].str_val));
             if (e == -1) sem_erro("variavel nao declarada: " + *(yyvsp[-6].str_val));
@@ -1594,11 +1599,11 @@ yyreduce:
 
             delete (yyvsp[-6].str_val);
       }
-#line 1598 "bison.tab.cpp"
+#line 1603 "bison.tab.cpp"
     break;
 
   case 17: /* atrib: ID LCOLCHETES expr RCOLCHETES ATRIB LPAR_EXPR expr RPAR_EXPR PEV  */
-#line 165 "synan.y"
+#line 168 "synan.y"
                                                                        {
             int e = getend(*(yyvsp[-8].str_val));
             if (e == -1) sem_erro("variavel nao declarada: " + *(yyvsp[-8].str_val));
@@ -1608,68 +1613,68 @@ yyreduce:
 
             delete (yyvsp[-8].str_val);
       }
-#line 1612 "bison.tab.cpp"
+#line 1617 "bison.tab.cpp"
     break;
 
   case 18: /* expr: expr MAIS termo  */
-#line 179 "synan.y"
+#line 182 "synan.y"
                       {
             std::cout << "add %t" << T << ", %t" << (yyvsp[-2].int_val) << ", %t" << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
       }
-#line 1621 "bison.tab.cpp"
+#line 1626 "bison.tab.cpp"
     break;
 
   case 19: /* expr: expr MENOS termo  */
-#line 183 "synan.y"
+#line 186 "synan.y"
                        {
             std::cout << "sub %t" << T << ", %t" << (yyvsp[-2].int_val) << ", %t" << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
       }
-#line 1630 "bison.tab.cpp"
+#line 1635 "bison.tab.cpp"
     break;
 
   case 20: /* expr: termo  */
-#line 187 "synan.y"
+#line 190 "synan.y"
             { (yyval.int_val) = (yyvsp[0].int_val); }
-#line 1636 "bison.tab.cpp"
+#line 1641 "bison.tab.cpp"
     break;
 
   case 21: /* termo: termo MULT fator  */
-#line 191 "synan.y"
+#line 194 "synan.y"
                        {
             std::cout << "mult %t" << T << ", %t" << (yyvsp[-2].int_val) << ", %t" << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
       }
-#line 1645 "bison.tab.cpp"
+#line 1650 "bison.tab.cpp"
     break;
 
   case 22: /* termo: termo DIV fator  */
-#line 195 "synan.y"
+#line 198 "synan.y"
                       {
             std::cout << "div %t" << T << ", %t" << (yyvsp[-2].int_val) << ", %t" << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
       }
-#line 1654 "bison.tab.cpp"
+#line 1659 "bison.tab.cpp"
     break;
 
   case 23: /* termo: termo MOD fator  */
-#line 199 "synan.y"
+#line 202 "synan.y"
                       {
             std::cout << "mod %t" << T << ", %t" << (yyvsp[-2].int_val) << ", %t" << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
       }
-#line 1663 "bison.tab.cpp"
+#line 1668 "bison.tab.cpp"
     break;
 
   case 24: /* termo: fator  */
-#line 203 "synan.y"
+#line 206 "synan.y"
             { (yyval.int_val) = (yyvsp[0].int_val); }
-#line 1669 "bison.tab.cpp"
+#line 1674 "bison.tab.cpp"
     break;
 
   case 25: /* fator: ID  */
-#line 207 "synan.y"
+#line 210 "synan.y"
          {
             int e = getend(*(yyvsp[0].str_val));
             if (e == -1) sem_erro("variavel nao declarada: " + *(yyvsp[0].str_val));
@@ -1678,29 +1683,29 @@ yyreduce:
             (yyval.int_val) = T++;
             delete (yyvsp[0].str_val);
       }
-#line 1682 "bison.tab.cpp"
+#line 1687 "bison.tab.cpp"
     break;
 
   case 26: /* fator: NUM  */
-#line 216 "synan.y"
+#line 219 "synan.y"
           {
             std::cout << "mov %t" << T << ", " << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
       }
-#line 1691 "bison.tab.cpp"
+#line 1696 "bison.tab.cpp"
     break;
 
   case 27: /* fator: LPAR_EXPR expr RPAR_EXPR  */
-#line 222 "synan.y"
+#line 225 "synan.y"
                                {
             /* apenas retorna o valor da expressao interna */
             (yyval.int_val) = (yyvsp[-1].int_val);
       }
-#line 1700 "bison.tab.cpp"
+#line 1705 "bison.tab.cpp"
     break;
 
   case 28: /* fator: ID LCOLCHETES expr RCOLCHETES  */
-#line 227 "synan.y"
+#line 230 "synan.y"
                                     {
             int e = getend(*(yyvsp[-3].str_val));
             if (e == -1) sem_erro("variavel nao declarada: " + *(yyvsp[-3].str_val));
@@ -1711,138 +1716,138 @@ yyreduce:
             (yyval.int_val) = T++;
             delete (yyvsp[-3].str_val);
       }
-#line 1715 "bison.tab.cpp"
+#line 1720 "bison.tab.cpp"
     break;
 
   case 29: /* condicoes: condicao  */
-#line 242 "synan.y"
+#line 245 "synan.y"
                { (yyval.int_val) = (yyvsp[0].int_val); val_stack.push((yyval.int_val)); }
-#line 1721 "bison.tab.cpp"
+#line 1726 "bison.tab.cpp"
     break;
 
   case 30: /* condicoes: condicao OR condicoes  */
-#line 243 "synan.y"
+#line 246 "synan.y"
                             {
             std::cout << "or %t" << T << ", %t" << (yyvsp[-2].int_val) << ", %t" << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
             val_stack.push((yyval.int_val));
       }
-#line 1731 "bison.tab.cpp"
+#line 1736 "bison.tab.cpp"
     break;
 
   case 31: /* condicoes: condicao AND condicoes  */
-#line 248 "synan.y"
+#line 251 "synan.y"
                              {
             std::cout << "and %t" << T << ", %t" << (yyvsp[-2].int_val) << ", %t" << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
             val_stack.push((yyval.int_val));
       }
-#line 1741 "bison.tab.cpp"
+#line 1746 "bison.tab.cpp"
     break;
 
   case 32: /* condicoes: NOT condicoes  */
-#line 253 "synan.y"
+#line 256 "synan.y"
                     {
             std::cout << "not %t" << T << ", %t" << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
             val_stack.push((yyval.int_val));
       }
-#line 1751 "bison.tab.cpp"
+#line 1756 "bison.tab.cpp"
     break;
 
   case 33: /* condicao: expr IGUAL expr  */
-#line 261 "synan.y"
+#line 264 "synan.y"
                       {
             std::cout << "equal %t" << T << ", %t" << (yyvsp[-2].int_val) << ", %t" << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
       }
-#line 1760 "bison.tab.cpp"
+#line 1765 "bison.tab.cpp"
     break;
 
   case 34: /* condicao: expr DIFERENTE expr  */
-#line 265 "synan.y"
+#line 268 "synan.y"
                           {
             std::cout << "diff %t" << T << ", %t" << (yyvsp[-2].int_val) << ", %t" << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
       }
-#line 1769 "bison.tab.cpp"
+#line 1774 "bison.tab.cpp"
     break;
 
   case 35: /* condicao: expr MAIORIGUAL expr  */
-#line 269 "synan.y"
+#line 272 "synan.y"
                            {
             std::cout << "greatereq %t" << T << ", %t" << (yyvsp[-2].int_val) << ", %t" << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
       }
-#line 1778 "bison.tab.cpp"
+#line 1783 "bison.tab.cpp"
     break;
 
   case 36: /* condicao: expr MENORIGUAL expr  */
-#line 273 "synan.y"
+#line 276 "synan.y"
                            {
             std::cout << "lesseq %t" << T << ", %t" << (yyvsp[-2].int_val) << ", %t" << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
       }
-#line 1787 "bison.tab.cpp"
+#line 1792 "bison.tab.cpp"
     break;
 
   case 37: /* condicao: expr MAIOR expr  */
-#line 277 "synan.y"
+#line 280 "synan.y"
                       {
             std::cout << "greater %t" << T << ", %t" << (yyvsp[-2].int_val) << ", %t" << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
       }
-#line 1796 "bison.tab.cpp"
+#line 1801 "bison.tab.cpp"
     break;
 
   case 38: /* condicao: expr MENOR expr  */
-#line 281 "synan.y"
+#line 284 "synan.y"
                       {
             std::cout << "less %t" << T << ", %t" << (yyvsp[-2].int_val) << ", %t" << (yyvsp[0].int_val) << std::endl;
             (yyval.int_val) = T++;
       }
-#line 1805 "bison.tab.cpp"
+#line 1810 "bison.tab.cpp"
     break;
 
   case 39: /* cremento_for: MAISMAIS  */
-#line 290 "synan.y"
+#line 293 "synan.y"
                { (yyval.int_val) = 1; }
-#line 1811 "bison.tab.cpp"
+#line 1816 "bison.tab.cpp"
     break;
 
   case 40: /* cremento_for: MENOSMENOS  */
-#line 291 "synan.y"
+#line 294 "synan.y"
                  { (yyval.int_val) = 2; }
-#line 1817 "bison.tab.cpp"
+#line 1822 "bison.tab.cpp"
     break;
 
   case 41: /* arglist: expr  */
-#line 298 "synan.y"
+#line 301 "synan.y"
            {
             std::cout << "printv %t" << (yyvsp[0].int_val) << std::endl;
       }
-#line 1825 "bison.tab.cpp"
+#line 1830 "bison.tab.cpp"
     break;
 
   case 42: /* arglist: expr VIRGULA arglist  */
-#line 301 "synan.y"
+#line 304 "synan.y"
                            {
             std::cout << "printv %t" << (yyvsp[-2].int_val) << std::endl;
       }
-#line 1833 "bison.tab.cpp"
+#line 1838 "bison.tab.cpp"
     break;
 
   case 43: /* imprime: PRINTF LPAR_EXPR STRING RPAR_EXPR PEV  */
-#line 309 "synan.y"
+#line 312 "synan.y"
                                             {
             std::cout << "printf \"" << *(yyvsp[-2].str_val) << "\"" << std::endl;
             delete (yyvsp[-2].str_val);
       }
-#line 1842 "bison.tab.cpp"
+#line 1847 "bison.tab.cpp"
     break;
 
   case 44: /* imprime: PRINTF LPAR_EXPR STRING VIRGULA arglist RPAR_EXPR PEV  */
-#line 317 "synan.y"
+#line 320 "synan.y"
                                                             {
             std::string s = *(yyvsp[-4].str_val);
             size_t pos;
@@ -1857,22 +1862,22 @@ yyreduce:
             }
             delete (yyvsp[-4].str_val);
       }
-#line 1861 "bison.tab.cpp"
+#line 1866 "bison.tab.cpp"
     break;
 
   case 45: /* ler: SCANF LPAR_EXPR ID RPAR_EXPR PEV  */
-#line 336 "synan.y"
+#line 339 "synan.y"
                                        {
             int e = getend(*(yyvsp[-2].str_val));
             if (e == -1) sem_erro("variavel nao declarada: " + *(yyvsp[-2].str_val));
             std::cout << "read %r" << e << std::endl;
             delete (yyvsp[-2].str_val);
       }
-#line 1872 "bison.tab.cpp"
+#line 1877 "bison.tab.cpp"
     break;
 
   case 46: /* ler: SCANF LPAR_EXPR ID LCOLCHETES expr RCOLCHETES RPAR_EXPR PEV  */
-#line 342 "synan.y"
+#line 345 "synan.y"
                                                                   {
             int e = getend(*(yyvsp[-5].str_val));
             if (e == -1) sem_erro("variavel nao declarada: " + *(yyvsp[-5].str_val));
@@ -1881,42 +1886,42 @@ yyreduce:
             T++;
             delete (yyvsp[-5].str_val);
       }
-#line 1885 "bison.tab.cpp"
+#line 1890 "bison.tab.cpp"
     break;
 
   case 47: /* $@1: %empty  */
-#line 356 "synan.y"
+#line 359 "synan.y"
                                      {
         int cond_tmp = val_stack.top(); val_stack.pop();
         int exit_label = S++;
         std::cout << "jf %t" << cond_tmp << ", R" << exit_label << std::endl;
         lbl_stack.push(exit_label);
     }
-#line 1896 "bison.tab.cpp"
+#line 1901 "bison.tab.cpp"
     break;
 
   case 48: /* condicional: IF LPAR_EXPR condicoes RPAR_EXPR $@1 LCHAVES codigos RCHAVES  */
-#line 361 "synan.y"
+#line 364 "synan.y"
                               {
         int exit_label = lbl_stack.top(); lbl_stack.pop();
         std::cout << "label R" << exit_label << std::endl;
     }
-#line 1905 "bison.tab.cpp"
+#line 1910 "bison.tab.cpp"
     break;
 
   case 49: /* $@2: %empty  */
-#line 367 "synan.y"
+#line 370 "synan.y"
                                      {
         int cond_tmp = val_stack.top(); val_stack.pop();
         int else_label = S++;
         std::cout << "jf %t" << cond_tmp << ", R" << else_label << std::endl;
         lbl_stack.push(else_label);
     }
-#line 1916 "bison.tab.cpp"
+#line 1921 "bison.tab.cpp"
     break;
 
   case 50: /* $@3: %empty  */
-#line 372 "synan.y"
+#line 375 "synan.y"
                               {
         int else_label = lbl_stack.top(); lbl_stack.pop();
         int end_label = S++;
@@ -1924,45 +1929,53 @@ yyreduce:
         std::cout << "label R" << else_label << std::endl;
         lbl_stack.push(end_label);
     }
-#line 1928 "bison.tab.cpp"
+#line 1933 "bison.tab.cpp"
     break;
 
   case 51: /* condicional: IF LPAR_EXPR condicoes RPAR_EXPR $@2 LCHAVES codigos RCHAVES $@3 ELSE LCHAVES codigos RCHAVES  */
-#line 378 "synan.y"
+#line 381 "synan.y"
                                    {
         int end_label = lbl_stack.top(); lbl_stack.pop();
         std::cout << "label R" << end_label << std::endl;
     }
-#line 1937 "bison.tab.cpp"
+#line 1942 "bison.tab.cpp"
     break;
 
-  case 52: /* $@4: %empty  */
-#line 388 "synan.y"
-                                                                  {
-            /* pop condição e criar rótulos; emitir label/ jf antes do bloco */
-            int cond_tmp = val_stack.top(); val_stack.pop();
-            int loop = S++;
-            int exit_label = S++;
-            std::cout << "label R" << loop << std::endl;
-            std::cout << "jf %t" << cond_tmp << ", R" << exit_label << std::endl;
-            lbl_stack.push(loop);
-            lbl_stack.push(exit_label);
-      }
-#line 1952 "bison.tab.cpp"
+  case 52: /* mid_loop_start: %empty  */
+#line 391 "synan.y"
+                {
+        int loop = S++;
+        int exit_label = S++;
+        loop_stack.push(loop);
+        exit_stack.push(exit_label);
+        std::cout << "label R" << loop << std::endl;
+    }
+#line 1954 "bison.tab.cpp"
     break;
 
-  case 53: /* laco: FOR LPAR_EXPR atrib condicoes PEV ID cremento_for RPAR_EXPR $@4 LCHAVES codigos RCHAVES  */
-#line 397 "synan.y"
-                                {
-            /* recuperar rótulos e emitir incremento + jump + label exit */
-            int exit_label = lbl_stack.top(); lbl_stack.pop();
-            int loop = lbl_stack.top(); lbl_stack.pop();
+  case 53: /* mid_loop_jf: %empty  */
+#line 402 "synan.y"
+                {
+        if (val_stack.empty()) sem_erro("condicao ausente no for/while");
+        int cond_tmp = val_stack.top(); val_stack.pop();
+        int exit_label = exit_stack.top();
+        std::cout << "jf %t" << cond_tmp << ", R" << exit_label << std::endl;
+    }
+#line 1965 "bison.tab.cpp"
+    break;
+
+  case 54: /* laco: FOR LPAR_EXPR atrib mid_loop_start condicoes mid_loop_jf PEV ID cremento_for RPAR_EXPR LCHAVES codigos RCHAVES  */
+#line 412 "synan.y"
+                                                                                                                     {
+            /* recuperar rótulos */
+            int loop = loop_stack.top(); loop_stack.pop();
+            int exit_label = exit_stack.top(); exit_stack.pop();
 
             /* valida var do incremento */
-            int e = getend(*(yyvsp[-6].str_val));
-            if (e == -1) sem_erro("variavel nao declarada no for: " + *(yyvsp[-6].str_val));
+            int e = getend(*(yyvsp[-5].str_val));
+            if (e == -1) sem_erro("variavel nao declarada no for: " + *(yyvsp[-5].str_val));
 
-            if ((yyvsp[-5].int_val) == 1)
+            if ((yyvsp[-4].int_val) == 1)
                 std::cout << "add %r" << e << ", %r" << e << ", 1" << std::endl;
             else
                 std::cout << "sub %r" << e << ", %r" << e << ", 1" << std::endl;
@@ -1970,38 +1983,25 @@ yyreduce:
             std::cout << "jump R" << loop << std::endl;
             std::cout << "label R" << exit_label << std::endl;
 
-            delete (yyvsp[-6].str_val);
+            delete (yyvsp[-5].str_val);
       }
-#line 1976 "bison.tab.cpp"
+#line 1989 "bison.tab.cpp"
     break;
 
-  case 54: /* $@5: %empty  */
-#line 418 "synan.y"
-                                          {
-            int cond_tmp = val_stack.top(); val_stack.pop();
-            int loop = S++;
-            int exit_label = S++;
-            std::cout << "label R" << loop << std::endl;
-            std::cout << "jf %t" << cond_tmp << ", R" << exit_label << std::endl;
-            lbl_stack.push(loop);
-            lbl_stack.push(exit_label);
-      }
-#line 1990 "bison.tab.cpp"
-    break;
+  case 55: /* laco: WHILE LPAR_EXPR mid_loop_start condicoes mid_loop_jf RPAR_EXPR LCHAVES codigos RCHAVES  */
+#line 433 "synan.y"
+                                                                                             {
+            int loop = loop_stack.top(); loop_stack.pop();
+            int exit_label = exit_stack.top(); exit_stack.pop();
 
-  case 55: /* laco: WHILE LPAR_EXPR condicoes RPAR_EXPR $@5 LCHAVES codigos RCHAVES  */
-#line 426 "synan.y"
-                                {
-            int exit_label = lbl_stack.top(); lbl_stack.pop();
-            int loop = lbl_stack.top(); lbl_stack.pop();
             std::cout << "jump R" << loop << std::endl;
             std::cout << "label R" << exit_label << std::endl;
-      }
+    }
 #line 2001 "bison.tab.cpp"
     break;
 
   case 56: /* retorno: RETURN expr PEV  */
-#line 437 "synan.y"
+#line 445 "synan.y"
                       {
             /* Raposeitor não precisa realmente de ret; colocar label/municao opcional */
             std::cout << "mov %r0, %t" << (yyvsp[-1].int_val) << std::endl; /* coloca em r0 por exemplo */
@@ -2234,7 +2234,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 443 "synan.y"
+#line 451 "synan.y"
 
 
 /* ---------------- ERRO SINTÁTICO ---------------- */

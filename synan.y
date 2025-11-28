@@ -36,10 +36,13 @@ int auxEnd = 0;
 int T = 0;  /* temporários %t */
 int S = 0;  /* labels R... */
 
-/* Pilha para rótulos usada nas ações mid-rule reescritas */
+/* Pilhas para rótulos usadas nas ações mid-rule reescritas */
 std::stack<int> lbl_stack;
 /* Pilha para armazenar o índice %t resultante de reduções de 'condicoes' */
 std::stack<int> val_stack;
+/* Pilhas específicas para laços (loop / exit) */
+std::stack<int> loop_stack;
+std::stack<int> exit_stack;
   
 /* Funções utilitárias */
 int getend(const std::string &id) {
@@ -383,27 +386,39 @@ condicional:
 
 /* ---------------- LAÇOS ---------------- */
 
+/* mid-marker: start of loop -> create labels and emit label Rloop */
+mid_loop_start:
+    /* vazio */ {
+        int loop = S++;
+        int exit_label = S++;
+        loop_stack.push(loop);
+        exit_stack.push(exit_label);
+        std::cout << "label R" << loop << std::endl;
+    }
+    ;
+
+/* mid-marker: after condicoes -> emit jf using cond temp and exit_label */
+mid_loop_jf:
+    /* vazio */ {
+        if (val_stack.empty()) sem_erro("condicao ausente no for/while");
+        int cond_tmp = val_stack.top(); val_stack.pop();
+        int exit_label = exit_stack.top();
+        std::cout << "jf %t" << cond_tmp << ", R" << exit_label << std::endl;
+    }
+    ;
+
 laco:
       /* for simplificado: for ( atrib ; condicoes ; id ++/-- ) { codigos } */
-      FOR LPAR_EXPR atrib condicoes PEV ID cremento_for RPAR_EXPR {
-            /* pop condição e criar rótulos; emitir label/ jf antes do bloco */
-            int cond_tmp = val_stack.top(); val_stack.pop();
-            int loop = S++;
-            int exit_label = S++;
-            std::cout << "label R" << loop << std::endl;
-            std::cout << "jf %t" << cond_tmp << ", R" << exit_label << std::endl;
-            lbl_stack.push(loop);
-            lbl_stack.push(exit_label);
-      } LCHAVES codigos RCHAVES {
-            /* recuperar rótulos e emitir incremento + jump + label exit */
-            int exit_label = lbl_stack.top(); lbl_stack.pop();
-            int loop = lbl_stack.top(); lbl_stack.pop();
+      FOR LPAR_EXPR atrib mid_loop_start condicoes mid_loop_jf PEV ID cremento_for RPAR_EXPR LCHAVES codigos RCHAVES {
+            /* recuperar rótulos */
+            int loop = loop_stack.top(); loop_stack.pop();
+            int exit_label = exit_stack.top(); exit_stack.pop();
 
             /* valida var do incremento */
-            int e = getend(*$6);
-            if (e == -1) sem_erro("variavel nao declarada no for: " + *$6);
+            int e = getend(*$8);
+            if (e == -1) sem_erro("variavel nao declarada no for: " + *$8);
 
-            if ($7 == 1)
+            if ($9 == 1)
                 std::cout << "add %r" << e << ", %r" << e << ", 1" << std::endl;
             else
                 std::cout << "sub %r" << e << ", %r" << e << ", 1" << std::endl;
@@ -411,24 +426,17 @@ laco:
             std::cout << "jump R" << loop << std::endl;
             std::cout << "label R" << exit_label << std::endl;
 
-            delete $6;
+            delete $8;
       }
 
-    /* while: emitir label/jf antes do bloco; jump/label após */
-    | WHILE LPAR_EXPR condicoes RPAR_EXPR {
-            int cond_tmp = val_stack.top(); val_stack.pop();
-            int loop = S++;
-            int exit_label = S++;
-            std::cout << "label R" << loop << std::endl;
-            std::cout << "jf %t" << cond_tmp << ", R" << exit_label << std::endl;
-            lbl_stack.push(loop);
-            lbl_stack.push(exit_label);
-      } LCHAVES codigos RCHAVES {
-            int exit_label = lbl_stack.top(); lbl_stack.pop();
-            int loop = lbl_stack.top(); lbl_stack.pop();
+    /* while: emitir label, avaliar condicoes, jf, executar bloco, jump/label */
+    | WHILE LPAR_EXPR mid_loop_start condicoes mid_loop_jf RPAR_EXPR LCHAVES codigos RCHAVES {
+            int loop = loop_stack.top(); loop_stack.pop();
+            int exit_label = exit_stack.top(); exit_stack.pop();
+
             std::cout << "jump R" << loop << std::endl;
             std::cout << "label R" << exit_label << std::endl;
-      }
+    }
     ;
 
 /* ---------------- RETURN ---------------- */
