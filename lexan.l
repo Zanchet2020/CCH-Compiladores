@@ -76,28 +76,28 @@ num_int   {digito}+
     /* --- REGRAS ESPECÍFICAS DO INITIAL --- */
 
     /* Delimitadores de bloco */
-"[:"               { return LCHAVES; }
-":]"               { return RCHAVES; }
+<INITIAL,TEMPLATE>"[:"   { return LCHAVES; }
+<INITIAL,TEMPLATE>":]"   { return RCHAVES; }
 
-"."                { return PEV; }
-":"                { return DOISPONTOS; }
+<INITIAL,TEMPLATE>"."     { return PEV; }
+<INITIAL,TEMPLATE>":"     { return DOISPONTOS; }
 
-    /* Palavras reservadas */
-"PRONUNTIARE"      { return PRINTF; }
-"INSCULPIRE"       { return SCANF; }
-"inteiro"          { return INT; }
-"float"            { return FLOAT; }
-"char"             { return CHAR; }
-"CIRCA"            { return FOR; }
-"ITERARE"          { return WHILE; }
-"SIVERITAS"        { return IF; }
-"ALITER"           { return ELSE; }
-"REVERSIO"         { return RETURN; }
-"SYMBOLUM"         { return DECLARACAO; }
-"ET"               { return AND; }
-"VEL"              { return OR; }
-"NON"              { return NOT; }
-"ACCIPIT"          { return ATRIB; }
+    /* Palavras reservadas (disponíveis em INITIAL e TEMPLATE) */
+<INITIAL,TEMPLATE>"PRONUNTIARE"      { return PRINTF; }
+<INITIAL,TEMPLATE>"INSCULPIRE"       { return SCANF; }
+<INITIAL,TEMPLATE>"inteiro"          { return INT; }
+<INITIAL,TEMPLATE>"float"            { return FLOAT; }
+<INITIAL,TEMPLATE>"char"             { return CHAR; }
+<INITIAL,TEMPLATE>"CIRCA"            { return FOR; }
+<INITIAL,TEMPLATE>"ITERARE"          { return WHILE; }
+<INITIAL,TEMPLATE>"SIVERITAS"        { return IF; }
+<INITIAL,TEMPLATE>"ALITER"           { return ELSE; }
+<INITIAL,TEMPLATE>"REVERSIO"         { return RETURN; }
+<INITIAL,TEMPLATE>"SYMBOLUM"         { return DECLARACAO; }
+<INITIAL,TEMPLATE>"ET"               { return AND; }
+<INITIAL,TEMPLATE>"VEL"              { return OR; }
+<INITIAL,TEMPLATE>"NON"              { return NOT; }
+<INITIAL,TEMPLATE>"ACCIPIT"          { return ATRIB; }
 
 
     /* --- LITERAIS (INITIAL e TEMPLATE) --- */
