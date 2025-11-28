@@ -1,38 +1,76 @@
+printf "Digite 5 numeros\n"
 mov %t0, 0
-mov %t1, 10
-store %t1, %t0(0)
-mov %t2, 1
-mov %t3, 20
-store %t3, %t2(0)
-mov %t4, 2
-mov %t5, 30
-store %t5, %t4(0)
-mov %t6, 3
-mov %t7, 40
-store %t7, %t6(0)
-mov %t8, 4
-mov %t9, 50
-store %t9, %t8(0)
-mov %t10, 0
-load %t11, %t10(0)
-mov %r5, %t11
-mov %t12, 2
-load %t13, %t12(0)
-mov %r6, %t13
-mov %t14, 4
-load %t15, %t14(0)
-mov %r7, %t15
-printf "Primeiro elemento:\n"
-mov %t16, %r5
-printv %t16
-printf ""
-printf "Terceiro elemento:\n"
-mov %t17, %r6
-printv %t17
-printf ""
-printf "Quinto elemento:\n"
-mov %t18, %r7
-printv %t18
-printf ""
-mov %t19, 0
-mov %r0, %t19
+mov %r5, %t0
+label R0
+mov %t1, %r5
+mov %t2, 5
+less %t3, %t1, %t2
+jf %t3, R1
+mov %t4, %r5
+printv %t4
+printf ": "
+mov %t5, %r5
+read %t6
+store %t6, %t5(0)
+printf "\n"
+add %r5, %r5, 1
+jump R0
+label R1
+mov %t7, 0
+mov %r5, %t7
+label R2
+mov %t8, %r5
+mov %t9, 5
+less %t10, %t8, %t9
+jf %t10, R3
+mov %t11, %r5
+load %t12, %t11(0)
+mov %r7, %t12
+mov %t13, %r5
+mov %t14, 1
+sub %t15, %t13, %t14
+mov %r6, %t15
+label R4
+mov %t16, %r6
+mov %t17, 0
+greatereq %t18, %t16, %t17
+mov %t19, %r6
+load %t20, %t19(0)
+mov %t21, %r7
+greater %t22, %t20, %t21
+and %t23, %t18, %t22
+jf %t23, R5
+mov %t24, %r6
+mov %t25, 1
+add %t26, %t24, %t25
+mov %t27, %r6
+load %t28, %t27(0)
+store %t28, %t26(0)
+mov %t29, %r6
+mov %t30, 1
+sub %t31, %t29, %t30
+mov %r6, %t31
+jump R4
+label R5
+mov %t32, %r6
+mov %t33, 1
+add %t34, %t32, %t33
+mov %t35, %r7
+store %t35, %t34(0)
+add %r5, %r5, 1
+jump R2
+label R3
+mov %t36, 0
+mov %r5, %t36
+label R6
+mov %t37, %r5
+mov %t38, 5
+less %t39, %t37, %t38
+jf %t39, R7
+mov %t40, %r5
+load %t41, %t40(0)
+printv %t41
+printf "\n\n "
+add %r5, %r5, 1
+jump R6
+label R7
