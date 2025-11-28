@@ -362,27 +362,53 @@ opt_template:
   ;
 
 condicional:
-    /* if simples: emitir jf antes do bloco, label após o bloco */
-    IF LPAR_EXPR condicoes RPAR_EXPR LCHAVES codigos RCHAVES {
-        int cond_tmp = val_stack.top(); val_stack.pop();
-        int exit_label = S++;
-        std::cout << "jf %t" << cond_tmp << ", R" << exit_label << std::endl;
-        std::cout << "label R" << exit_label << std::endl;
-    }
+    /* IF-ELSE */
+    IF LPAR_EXPR condicoes RPAR_EXPR LCHAVES
+        {
+            int cond_tmp;
+            if (val_stack.empty()) {
+                std::cout << "mov %t" << T << ", 1" << std::endl;
+                cond_tmp = T++;
+            } else {
+                cond_tmp = val_stack.top(); val_stack.pop();
+            }
+            int else_label = S++;
+            int end_label = S++;
+            std::cout << "jf %t" << cond_tmp << ", R" << else_label << std::endl;
+            lbl_stack.push(end_label);    // push end_label first
+            lbl_stack.push(else_label);   // then else_label
+        }
+    codigos RCHAVES ELSE opt_template LCHAVES codigos RCHAVES
+        {
+            if (lbl_stack.empty()) sem_erro("lbl_stack vazio no IF-ELSE (else_label)");
+            int else_label = lbl_stack.top(); lbl_stack.pop();
+            if (lbl_stack.empty()) sem_erro("lbl_stack vazio no IF-ELSE (end_label)");
+            int end_label = lbl_stack.top(); lbl_stack.pop();
+            std::cout << "jump R" << end_label << std::endl;
+            std::cout << "label R" << else_label << std::endl;
+            std::cout << "label R" << end_label << std::endl;
+        }
 
-  /* if-else: aceitar opcional "|:|" entre ALITER e o bloco */
-  | IF LPAR_EXPR condicoes RPAR_EXPR LCHAVES codigos RCHAVES ELSE opt_template LCHAVES codigos RCHAVES {
-        int cond_tmp = val_stack.top(); val_stack.pop();
-        int else_label = S++;
-        int end_label = S++;
-
-        std::cout << "jf %t" << cond_tmp << ", R" << else_label << std::endl;
-        /* bloco IF já foi gerado em $7 (codigos) */
-        std::cout << "jump R" << end_label << std::endl;
-        std::cout << "label R" << else_label << std::endl;
-        /* bloco ELSE já foi gerado em $11 (codigos) */
-        std::cout << "label R" << end_label << std::endl;
-    }
+    /* IF simples */
+  | IF LPAR_EXPR condicoes RPAR_EXPR LCHAVES
+        {
+            int cond_tmp;
+            if (val_stack.empty()) {
+                std::cout << "mov %t" << T << ", 1" << std::endl;
+                cond_tmp = T++;
+            } else {
+                cond_tmp = val_stack.top(); val_stack.pop();
+            }
+            int exit_label = S++;
+            std::cout << "jf %t" << cond_tmp << ", R" << exit_label << std::endl;
+            lbl_stack.push(exit_label);
+        }
+    codigos RCHAVES
+        {
+            if (lbl_stack.empty()) sem_erro("lbl_stack vazio no IF simples");
+            int exit_label = lbl_stack.top(); lbl_stack.pop();
+            std::cout << "label R" << exit_label << std::endl;
+        }
   ;
 
 /* ---------------- LAÇOS ---------------- */

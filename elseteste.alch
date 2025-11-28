@@ -6,20 +6,20 @@ inteiro y.
 x ACCIPIT 10.
 y ACCIPIT 20.
 
-PRONUNTIARE |:"Teste 1: IF verdadeiro\n":|.
+PRONUNTIARE |:"Teste 1: IF verdadeiro":|.
 
 SIVERITAS |: x < y :| [:
-    PRONUNTIARE |:"Entrou no IF (1)\n":|.
+    PRONUNTIARE |:"Entrou no IF (1)":|.
 :] ALITER |:| [:
-    PRONUNTIARE |:"Entrou no ELSE (1)\n":|.
+    PRONUNTIARE |:"Entrou no ELSE (1)":|.
 :]
 
-PRONUNTIARE |:"Teste 2: IF falso"\n:|.
+PRONUNTIARE |:"Teste 2: IF falso":|.
 
 SIVERITAS |: x > y :| [:
-    PRONUNTIARE |:"Entrou no IF (2)\n":|.
+    PRONUNTIARE |:"Entrou no IF (2)":|.
 :] ALITER |:| [:
-    PRONUNTIARE |:"Entrou no ELSE (2)\n":|.
+    PRONUNTIARE |:"Entrou no ELSE (2)":|.
 :]
 
 REVERSIO 0.

@@ -6,6 +6,7 @@
 %}
 
 %option noyywrap
+%option c++
 %x COMMENT
 %x TEMPLATE
 
@@ -39,13 +40,6 @@ num_int   {digito}+
 
     /* --- MUDANÇA DE ESTADOS --- */
 
-    /* match the empty template sequence first (three chars) to avoid overlap */
-<INITIAL,TEMPLATE>"|:|"    { return EMPTY_TEMPLATE; }
-
-/* Entra no Template */
-<INITIAL,TEMPLATE>"|:"      { BEGIN(TEMPLATE); return LPAR_EXPR; }
-/* Sai do Template */
-<TEMPLATE>":|"              { BEGIN(INITIAL); return RPAR_EXPR; }
 
     /* --- REGRAS COMPARTILHADAS (INITIAL e TEMPLATE) --- */
     /* Isso evita duplicar código para operadores que existem nos dois contextos */
@@ -74,6 +68,11 @@ num_int   {digito}+
     /* Delimitadores de bloco */
 <INITIAL,TEMPLATE>"[:"   { return LCHAVES; }
 <INITIAL,TEMPLATE>":]"   { return RCHAVES; }
+
+<INITIAL,TEMPLATE>"|:|"    { return EMPTY_TEMPLATE; }
+
+<INITIAL,TEMPLATE>"|:"      { return LPAR_EXPR; }
+<INITIAL,TEMPLATE>":|"      { return RPAR_EXPR; }
 
 <INITIAL,TEMPLATE>"."     { return PEV; }
 <INITIAL,TEMPLATE>":"     { return DOISPONTOS; }
